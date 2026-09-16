@@ -8,7 +8,7 @@ Every `az` command in this repo was verified against a real, locally installed A
 
 ---
 
-## 🎯 Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -22,7 +22,7 @@ flowchart TD
 
 ---
 
-## 📚 Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -44,7 +44,7 @@ flowchart TD
 
 ---
 
-## 🛠️ Quick Start
+## Quick Start
 
 ### 1. Provision the server (Bicep)
 
