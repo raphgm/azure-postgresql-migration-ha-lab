@@ -6,16 +6,23 @@
 #   - Target schema already created (pg_dump --schema-only | pg_restore)
 #   - wal_level = 'logical' set on the source (requires a restart)
 #
-# Usage: ./02-logical-replication.sh <source-host> <target-host> <database-name>
+# Usage: ./02-logical-replication.sh <source-host> <target-host> <database-name> [--dry-run]
 set -euo pipefail
 
-SOURCE_HOST="${1:?Usage: $0 <source-host> <target-host> <database-name>}"
-TARGET_HOST="${2:?Usage: $0 <source-host> <target-host> <database-name>}"
-DB_NAME="${3:?Usage: $0 <source-host> <target-host> <database-name>}"
+SOURCE_HOST="${1:?Usage: $0 <source-host> <target-host> <database-name> [--dry-run]}"
+TARGET_HOST="${2:?Usage: $0 <source-host> <target-host> <database-name> [--dry-run]}"
+DB_NAME="${3:?Usage: $0 <source-host> <target-host> <database-name> [--dry-run]}"
+DRY_RUN=false
+[[ "${4:-}" == "--dry-run" ]] && DRY_RUN=true
 
 echo "=== Step 1: copy schema only to target (run once) ==="
-echo "pg_dump -h $SOURCE_HOST -U dbadmin -d $DB_NAME --schema-only -f schema.sql"
-echo "psql -h $TARGET_HOST -U dbadmin -d $DB_NAME -f schema.sql"
+if [[ "$DRY_RUN" == true ]]; then
+  echo "pg_dump -h $SOURCE_HOST -U dbadmin -d $DB_NAME --schema-only -f schema.sql"
+  echo "psql -h $TARGET_HOST -U dbadmin -d $DB_NAME -f schema.sql"
+else
+  pg_dump -h "$SOURCE_HOST" -U dbadmin -d "$DB_NAME" --schema-only -f schema.sql
+  psql -h "$TARGET_HOST" -U dbadmin -d "$DB_NAME" -f schema.sql
+fi
 echo
 
 echo "=== Step 2: create the publication on the source ==="
